@@ -63,9 +63,18 @@ def fmt_b(v, suffix=""):
 
 
 def pct(v, digits=1):
+    """Convertit un ratio décimal (ex: 0.25) en pourcentage (25.0%).
+    Pour les valeurs déjà en pourcentage (ex: dividendYield), utiliser pct_raw."""
     if v is None or pd.isna(v):
         return "n/a"
-    return f"{v*100:.{digits}f}%" if abs(v) < 10 else f"{v:.{digits}f}%"
+    return f"{v*100:.{digits}f}%"
+
+
+def pct_raw(v, digits=2):
+    """Pour les valeurs déjà exprimées en % par Yahoo (ex: dividendYield)."""
+    if v is None or pd.isna(v):
+        return "n/a"
+    return f"{v:.{digits}f}%"
 
 
 def cagr(start, end, years):
@@ -153,7 +162,7 @@ k7.metric("ROE", pct(info.get("returnOnEquity")))
 k8.metric("Marge nette", pct(info.get("profitMargins")))
 k9.metric("Marge op.", pct(info.get("operatingMargins")))
 k10.metric("Croissance CA YoY", pct(info.get("revenueGrowth")))
-k11.metric("Div yield", pct(info.get("dividendYield")))
+k11.metric("Div yield", pct_raw(info.get("dividendYield")))
 k12.metric("Beta", f"{info.get('beta'):.2f}" if info.get("beta") else "n/a")
 
 tab1, tab2, tab3, tab4 = st.tabs(
