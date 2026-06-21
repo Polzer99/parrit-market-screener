@@ -2,6 +2,7 @@
 Tape un nom d'entreprise (LVMH, Apple, Nvidia…) ou un ticker.
 Sources: Yahoo Finance via yfinance + API search.
 """
+import logging
 import re
 
 import pandas as pd
@@ -10,6 +11,8 @@ import requests
 import streamlit as st
 import yfinance as yf
 from plotly.subplots import make_subplots
+
+logger = logging.getLogger(__name__)
 
 st.set_page_config(page_title="Market Screener — Parrit", layout="wide", page_icon="📊")
 
@@ -37,7 +40,8 @@ def search_yahoo(query: str):
             exch = q.get("exchDisp") or q.get("exchange") or ""
             out.append((sym, name, exch))
         return out
-    except Exception:
+    except Exception as exc:
+        logger.warning("Yahoo search failed for query %s: %s", query, exc)
         return []
 
 
@@ -46,7 +50,8 @@ def load_ticker(t: str):
     tk = yf.Ticker(t)
     try:
         info = tk.info
-    except Exception:
+    except Exception as exc:
+        logger.warning("Yahoo ticker info failed for %s: %s", t, exc)
         info = {}
     return tk, info
 
@@ -436,7 +441,8 @@ with tab4:
         cf_df = tk.cashflow
         if cf_df is not None and not cf_df.empty and "Free Cash Flow" in cf_df.index:
             last_fcf = cf_df.loc["Free Cash Flow"].dropna().iloc[0] / 1e6
-    except Exception:
+    except Exception as exc:
+        logger.warning("Free Cash Flow lookup failed for DCF default: %s", exc)
         pass
 
     fcf0 = st.number_input(
