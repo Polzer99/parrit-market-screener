@@ -1,0 +1,9 @@
+# .github/dependabot.yml — Porte 3 AI Playbook (REGLES-DOR §33)
+version: 2
+updates:
+  - package-ecosystem: 'pip'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 10
+    labels: ['dependencies']
